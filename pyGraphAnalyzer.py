@@ -40,28 +40,27 @@ def generate_cypher(functions, calls):
     file_nodes = set()
     
     # 创建文件节点
-    for file_path, _ in set(functions.values()):  # 解包元组，获取file_path
+    for file_path, _ in set(functions.values()):
         file_nodes.add(file_path)
-        # 将路径中的单反斜杠替换为双反斜杠
         safe_path = file_path.replace('\\', '\\\\')
         cypher_commands.append(
-            f"CREATE (f:PythonFile {{path: '{safe_path}'}});\n"
+            f"MERGE (f:PythonFile {{path: '{safe_path}'}});\n"  # CREATE -> MERGE
         )
     
     # 创建函数节点并关联到文件
     for func, (file_path, line_number) in functions.items():
-        # 将路径中的单反斜杠替换为双反斜杠
+        file_name = os.path.basename(file_path)
         safe_path = file_path.replace('\\', '\\\\')
         cypher_commands.append(
-            f"CREATE (fn:PythonFunction {{name: '{func}', line_number: {line_number}}});\n"
-            f"MATCH (f:PythonFile {{path: '{safe_path}'}}), (fn:PythonFunction {{name: '{func}'}})\n"
-            f"CREATE (fn)-[:DEFINED_IN]->(f);\n"
+            f"CREATE (fn:PythonFunction {{name: '{func}', line_number: {line_number}, file_name: '{file_name}'}});\n"  # CREATE -> MERGE
+            f"MATCH (f:PythonFile {{path: '{safe_path}'}}), (fn:PythonFunction {{name: '{func}'}}) "
+            f"CREATE (fn)-[:DEFINED_IN {{line_number: {line_number}}}]->(f);\n"  # CREATE -> MERGE
         )
     
     # 创建调用关系
     for caller, callee, line in calls:
         cypher_commands.append(
-            f"MATCH (a:PythonFunction {{name: '{caller}'}}), (b:PythonFunction {{name: '{callee}'}})\n"
+            f"MATCH (a:PythonFunction {{name: '{caller}'}}), (b:PythonFunction {{name: '{callee}'}}) "
             f"CREATE (a)-[:CALLS {{line: {line}}}]->(b);\n"
         )
     
