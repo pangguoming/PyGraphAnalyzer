@@ -15,10 +15,21 @@ PyGraphAnalyzer 是一个用于分析 Python 项目代码结构的工具，能�
    ```bash
    git clone https://github.com/yourusername/pygraphanalyzer.git
    ```
-2. 安装依赖
-3. 运行分析工具
-4. 查看输出结果
-   
+1.  安装依赖
+ ```bash
+   pip install pycparser
+ ```
+1. 修改要分析的python项目路径和输出cypher文件保存路径
+```python
+ project_path = "D:\\PythonWorkspace\\OpenManus-main"  # 修改为你的Python项目路径
+ ...
+ output_file = "output.cypher"  # 修改为输出Cypher语句的文件路径
+```
+1.  运行分析工具
+ ```bash
+   python python_code_analyzer.py
+ ```
+1.  查看输出结果   
    - 生成的 Cypher 语句会保存在 output.cypher 文件中
    - 可以在 Neo4j 等图数据库中导入这些 Cypher 语句
 ## 配置选项
